@@ -106,3 +106,105 @@ h1 span {
     font-size: 16px;
   }
 }
+
+.restaurant-section {
+  margin-top: 40px;
+}
+
+.restaurant-section-title {
+  color: #642d40;
+  font-size: 25px;
+  margin-bottom: 10px;
+}
+
+.restaurant-section-description {
+  color: #775d64;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.restaurant-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.restaurant-card {
+  padding: 24px 18px;
+  border: 1px solid #efd9d9;
+  border-radius: 18px;
+  background-color: #fff8f7;
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+
+.restaurant-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(100, 35, 55, 0.08);
+}
+
+.restaurant-card.selected {
+  border: 2px solid #8d354f;
+  background-color: #fff0f2;
+}
+
+.restaurant-emoji {
+  font-size: 36px;
+  margin-bottom: 12px;
+}
+
+.restaurant-card h2 {
+  color: #642d40;
+  font-size: 20px;
+  margin: 0 0 10px;
+}
+
+.restaurant-description {
+  color: #775d64;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.restaurant-button {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #8d354f;
+  border-radius: 999px;
+  background-color: white;
+  color: #8d354f;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.restaurant-button:hover {
+  background-color: #8d354f;
+  color: white;
+}
+
+.restaurant-card.selected .restaurant-button {
+  background-color: #8d354f;
+  color: white;
+}
+
+.selection-message {
+  margin-top: 24px;
+  padding: 14px;
+  border-radius: 12px;
+  background-color: #fff0f2;
+  color: #8d354f;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+@media (min-width: 600px) {
+  .restaurant-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .restaurant-card:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+}
