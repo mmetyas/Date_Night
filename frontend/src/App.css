@@ -208,3 +208,60 @@ h1 span {
     grid-column: 1 / -1;
   }
 }
+
+.date-section {
+  margin-top: 32px;
+  padding: 24px 18px;
+  border: 1px solid #efd9d9;
+  border-radius: 18px;
+  background-color: #fff8f7;
+  text-align: left;
+}
+
+.date-section h2 {
+  color: #642d40;
+  font-size: 21px;
+  margin: 0 0 16px;
+}
+
+.date-section label {
+  display: block;
+  margin-bottom: 10px;
+  color: #775d64;
+  font-size: 14px;
+}
+
+.date-section input {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #dcbfc7;
+  border-radius: 10px;
+  background: white;
+  color: #642d40;
+  font: inherit;
+}
+
+.confirm-button {
+  width: 100%;
+  margin-top: 24px;
+}
+
+.confirm-button:disabled {
+  background-color: #cbb5bb;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.confirmation-message {
+  margin-top: 24px;
+  padding: 20px;
+  border: 1px solid #e7c4cf;
+  border-radius: 16px;
+  background-color: #fff0f2;
+  color: #642d40;
+  line-height: 1.7;
+}
+
+.confirmation-message h2 {
+  margin-top: 0;
+}
