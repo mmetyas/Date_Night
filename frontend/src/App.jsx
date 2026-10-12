@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState , useEffect} from 'react';
 import './App.css';
 import RestaurantCard from './Components/RestaurantCard';
 import restaurants from './data/restaurants';
@@ -8,6 +8,26 @@ function App() {
   const [selectedRestaurantId, setSelectedRestaurantId] = useState(null);
   const [selectedDate, setSelectedDate] = useState('');
   const [invitationConfirmed, setInvitationConfirmed] = useState(false);
+  const [backendMessage, setBackendMessage] = useState('');
+
+useEffect(() => {
+  fetch('http://localhost:8080/api/date-night/hello')
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Failed to fetch message');
+      }
+
+      return response.text();
+    })
+    .then((message) => {
+      setBackendMessage(message);
+    })
+    .catch((error) => {
+      console.error('Backend error:', error);
+    });
+}, []);
+
+
 
   const selectedRestaurant = restaurants.find(
     (restaurant) => restaurant.id === selectedRestaurantId
@@ -42,6 +62,12 @@ function App() {
           I'd love to take you on a special date.
           Pick the place and date, and I'll take care of the rest.
         </p>
+
+        {backendMessage && (
+          <p className="backend-message">
+            {backendMessage}
+          </p>
+        )}
 
         <div className="restaurant-section">
           <h2 className="restaurant-section-title">
