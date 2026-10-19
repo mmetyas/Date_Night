@@ -4,12 +4,15 @@ package com.datenight.backend.controller;
 import com.datenight.backend.dto.CreateInvitationRequest;
 import com.datenight.backend.entity.DateInvitation;
 import com.datenight.backend.service.DateInvitationService;
+
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/date-night")
@@ -32,5 +35,10 @@ public class DateNightController {
             @RequestBody CreateInvitationRequest request) {
 
         return dateInvitationService.createInvitation(request);
+    }
+
+    @GetMapping("/invitations")
+    public List<DateInvitation> getAllInvitations() {
+        return dateInvitationService.getAllInvitations();
     }
 }
