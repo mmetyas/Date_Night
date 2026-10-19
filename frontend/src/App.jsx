@@ -1,5 +1,5 @@
 
-import { useState , useEffect} from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 import RestaurantCard from './Components/RestaurantCard';
 import restaurants from './data/restaurants';
@@ -10,24 +10,51 @@ function App() {
   const [invitationConfirmed, setInvitationConfirmed] = useState(false);
   const [backendMessage, setBackendMessage] = useState('');
 
-useEffect(() => {
-  fetch('http://localhost:8080/api/date-night/hello')
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error('Failed to fetch message');
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
+
+  const [invitations, setInvitations] = useState([]);
+  const [isLoadingInvitations, setIsLoadingInvitations] = useState(true);
+
+  useEffect(() => {
+    fetch('http://localhost:8080/api/date-night/hello')
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch message');
+        }
+
+        return response.text();
+      })
+      .then((message) => {
+        setBackendMessage(message);
+      })
+      .catch((error) => {
+        console.error('Backend error:', error);
+      });
+  }, []);
+
+  useEffect(() => {
+    async function fetchInvitations() {
+      try {
+        const response = await fetch(
+          'http://localhost:8080/api/date-night/invitations'
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch invitations.');
+        }
+
+        const data = await response.json();
+        setInvitations(data);
+      } catch (error) {
+        console.error('Error fetching invitations:', error);
+      } finally {
+        setIsLoadingInvitations(false);
       }
+    }
 
-      return response.text();
-    })
-    .then((message) => {
-      setBackendMessage(message);
-    })
-    .catch((error) => {
-      console.error('Backend error:', error);
-    });
-}, []);
-
-
+    fetchInvitations();
+  }, []);
 
   const selectedRestaurant = restaurants.find(
     (restaurant) => restaurant.id === selectedRestaurantId
@@ -38,12 +65,52 @@ useEffect(() => {
     setInvitationConfirmed(false);
   }
 
-  function handleConfirmInvitation() {
+  async function handleConfirmInvitation() {
     if (!selectedRestaurantId || !selectedDate) {
       return;
     }
 
-    setInvitationConfirmed(true);
+    setIsSaving(true);
+    setSaveError('');
+    setInvitationConfirmed(false);
+
+    try {
+      const response = await fetch(
+        'http://localhost:8080/api/date-night/invitations',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            restaurantName: selectedRestaurant.name,
+            selectedDate: selectedDate,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to save the invitation.');
+      }
+
+      const savedInvitation = await response.json();
+
+      console.log('Invitation saved:', savedInvitation);
+
+      setInvitations((previousInvitations) => [
+        ...previousInvitations,
+        savedInvitation,
+      ]);
+
+      setInvitationConfirmed(true);
+    } catch (error) {
+      console.error('Error saving invitation:', error);
+      setSaveError(
+        'Could not save your invitation. Please try again.'
+      );
+    } finally {
+      setIsSaving(false);
+    }
   }
 
   return (
@@ -111,10 +178,16 @@ useEffect(() => {
           <button
             className="invitation-button confirm-button"
             onClick={handleConfirmInvitation}
-            disabled={!selectedRestaurantId || !selectedDate}
+            disabled={!selectedRestaurantId || !selectedDate || isSaving}
           >
-            Confirm Our Date ❤️
+            {isSaving ? 'Saving...' : 'Confirm Our Date ❤️'}
           </button>
+
+          {saveError && (
+            <p className="error-message" role="alert">
+              {saveError}
+            </p>
+          )}
 
           {invitationConfirmed && (
             <div className="confirmation-message">
@@ -129,6 +202,34 @@ useEffect(() => {
             </div>
           )}
         </div>
+
+
+
+        <section className="saved-invitations">
+          <h2>Our Planned Dates 💕</h2>
+
+          {isLoadingInvitations ? (
+            <p>Loading our plans...</p>
+          ) : invitations.length === 0 ? (
+            <p>No dates planned yet. Let's create our first one!</p>
+          ) : (
+            <div className="saved-invitations-list">
+              {invitations.map((invitation) => (
+                <article
+                  className="saved-invitation-card"
+                  key={invitation.id}
+                >
+                  <h3>{invitation.restaurantName}</h3>
+                  <p>
+                    📅 Date: {invitation.selectedDate}
+                  </p>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+
+
 
         <p className="footer-message">
           Made with love, just for you.
