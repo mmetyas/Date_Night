@@ -1,6 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import PageLayout from '../Components/PageLayout';
 
 function InvitationsPage() {
   const [invitations, setInvitations] = useState([]);
@@ -34,51 +35,46 @@ function InvitationsPage() {
   }, []);
 
   return (
-    <main className="invitation-page">
-      <section className="invitation-card">
-        <h1>Our Planned Dates 💕</h1>
+    <PageLayout>
+      <h1>Our Planned Dates 💕</h1>
 
-        <p className="invitation-message">
-          Every date is another beautiful memory waiting to happen.
+      <p className="invitation-message">
+        Every date is another beautiful memory waiting to happen.
+      </p>
+
+      {isLoading ? (
+        <p>Loading our plans...</p>
+      ) : loadError ? (
+        <p className="error-message" role="alert">
+          {loadError}
         </p>
-
-        {isLoading ? (
-          <p>Loading our plans...</p>
-        ) : loadError ? (
-          <p className="error-message" role="alert">
-            {loadError}
-          </p>
-        ) : invitations.length === 0 ? (
-          <p>No dates planned yet. Let's create our first one!</p>
-        ) : (
-          <div className="saved-invitations-list">
-            {invitations.map((invitation) => (
-              <article
-                className="saved-invitation-card"
-                key={invitation.id}
-              >
-                <h2>{invitation.restaurantName}</h2>
-                <p>📅 Date: {invitation.selectedDate}</p>
-              </article>
-            ))}
-          </div>
-        )}
-
-        <div className="home-actions">
-          <Link to="/restaurants" className="invitation-button">
-            Plan Another Date ❤️
-          </Link>
-
-          <Link to="/" className="invitation-button">
-            Back to Home
-          </Link>
+      ) : invitations.length === 0 ? (
+        <p>No dates planned yet. Let's create our first one!</p>
+      ) : (
+        <div className="saved-invitations-list">
+          {invitations.map((invitation) => (
+            <article
+              className="saved-invitation-card"
+              key={invitation.id}
+            >
+              <h2>{invitation.restaurantName}</h2>
+              <p>📅 Date: {invitation.selectedDate}</p>
+            </article>
+          ))}
         </div>
+      )}
 
-        <p className="footer-message">Made with love, just for you.</p>
-      </section>
-    </main>
+      <div className="home-actions">
+        <Link to="/restaurants" className="invitation-button">
+          Plan Another Date ❤️
+        </Link>
+
+        <Link to="/" className="invitation-button">
+          Back to Home
+        </Link>
+      </div>
+    </PageLayout>
   );
 }
 
 export default InvitationsPage;
-
