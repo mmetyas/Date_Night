@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import RestaurantCard from '../Components/RestaurantCard';
 import PageLayout from '../Components/PageLayout';
 import restaurants from '../data/restaurants';
+import { createInvitation } from '../services/invitationService';
 
 function RestaurantsPage() {
   const [selectedRestaurantId, setSelectedRestaurantId] = useState(null);
@@ -32,25 +33,11 @@ function RestaurantsPage() {
     setInvitationConfirmed(false);
 
     try {
-      const response = await fetch(
-        'http://localhost:8080/api/date-night/invitations',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            restaurantName: selectedRestaurant.name,
-            selectedDate,
-          }),
-        }
-      );
+      await createInvitation({
+        restaurantName: selectedRestaurant.name,
+        selectedDate,
+      });
 
-      if (!response.ok) {
-        throw new Error('Failed to save the invitation.');
-      }
-
-      await response.json();
       setInvitationConfirmed(true);
     } catch (error) {
       console.error('Error saving invitation:', error);

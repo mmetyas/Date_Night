@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PageLayout from '../Components/PageLayout';
+import { getAllInvitations } from '../services/invitationService';
 
 function InvitationsPage() {
   const [invitations, setInvitations] = useState([]);
@@ -11,15 +12,7 @@ function InvitationsPage() {
   useEffect(() => {
     async function fetchInvitations() {
       try {
-        const response = await fetch(
-          'http://localhost:8080/api/date-night/invitations'
-        );
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch invitations.');
-        }
-
-        const data = await response.json();
+        const data = await getAllInvitations();
         setInvitations(data);
       } catch (error) {
         console.error('Error fetching invitations:', error);
