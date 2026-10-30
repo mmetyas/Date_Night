@@ -5,8 +5,11 @@ import com.datenight.backend.dto.CreateInvitationRequest;
 import com.datenight.backend.entity.DateInvitation;
 import com.datenight.backend.service.DateInvitationService;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,5 +43,14 @@ public class DateNightController {
     @GetMapping("/invitations")
     public List<DateInvitation> getAllInvitations() {
         return dateInvitationService.getAllInvitations();
+    }
+
+    @DeleteMapping("/invitations/{invitationId}")
+    public ResponseEntity<Void> deleteInvitation(
+            @PathVariable Long invitationId) {
+
+        dateInvitationService.deleteInvitation(invitationId);
+
+        return ResponseEntity.noContent().build();
     }
 }

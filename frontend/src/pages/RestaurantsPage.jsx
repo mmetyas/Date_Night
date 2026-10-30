@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom';
 import RestaurantCard from '../Components/RestaurantCard';
 import PageLayout from '../Components/PageLayout';
 import restaurants from '../data/restaurants';
-import { createInvitation } from '../services/invitationService';
+//import { createInvitation } from '../services/invitationService';
+import { createInvitation } from '../Services/invitationService';
 
 function RestaurantsPage() {
   const [selectedRestaurantId, setSelectedRestaurantId] = useState(null);

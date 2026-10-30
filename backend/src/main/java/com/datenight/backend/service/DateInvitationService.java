@@ -4,7 +4,9 @@ package com.datenight.backend.service;
 import com.datenight.backend.dto.CreateInvitationRequest;
 import com.datenight.backend.entity.DateInvitation;
 import com.datenight.backend.repository.DateInvitationRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -31,5 +33,17 @@ public class DateInvitationService {
 
     public List<DateInvitation> getAllInvitations() {
         return dateInvitationRepository.findAll();
+    }
+
+    public void deleteInvitation(Long invitationId) {
+
+        DateInvitation invitation = dateInvitationRepository
+                .findById(invitationId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Invitation not found"
+                ));
+
+        dateInvitationRepository.delete(invitation);
     }
 }

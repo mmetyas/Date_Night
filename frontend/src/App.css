@@ -265,3 +265,30 @@ h1 span {
 .confirmation-message h2 {
   margin-top: 0;
 }
+
+
+
+.delete-button {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 12px;
+  font-size: 14px;
+}
+
+.delete-button:hover {
+  background-color: #c0392b;
+}
+
+.delete-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error-message {
+  color: #e74c3c;
+  margin-top: 12px;
+}

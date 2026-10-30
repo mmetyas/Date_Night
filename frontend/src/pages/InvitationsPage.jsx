@@ -2,12 +2,17 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PageLayout from '../Components/PageLayout';
-import { getAllInvitations } from '../services/invitationService';
+import {
+  getAllInvitations,
+  deleteInvitation,
+} from '../Services/invitationService';
 
 function InvitationsPage() {
   const [invitations, setInvitations] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
+  const [deletingId, setDeletingId] = useState(null);
+  const [deleteError, setDeleteError] = useState('');
 
   useEffect(() => {
     async function fetchInvitations() {
@@ -26,6 +31,34 @@ function InvitationsPage() {
 
     fetchInvitations();
   }, []);
+
+  async function handleDeleteInvitation(invitationId) {
+    const confirmed = window.confirm(
+      'Are you sure you want to delete this date?'
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setDeletingId(invitationId);
+    setDeleteError('');
+
+    try {
+      await deleteInvitation(invitationId);
+
+      setInvitations((currentInvitations) =>
+        currentInvitations.filter(
+          (invitation) => invitation.id !== invitationId
+        )
+      );
+    } catch (error) {
+      console.error('Error deleting invitation:', error);
+      setDeleteError('Could not delete this date. Please try again.');
+    } finally {
+      setDeletingId(null);
+    }
+  }
 
   return (
     <PageLayout>
@@ -51,10 +84,29 @@ function InvitationsPage() {
               key={invitation.id}
             >
               <h2>{invitation.restaurantName}</h2>
+
               <p>📅 Date: {invitation.selectedDate}</p>
+
+              <button
+                className="delete-button"
+                onClick={() =>
+                  handleDeleteInvitation(invitation.id)
+                }
+                disabled={deletingId === invitation.id}
+              >
+                {deletingId === invitation.id
+                  ? 'Deleting...'
+                  : 'Delete Date 🗑️'}
+              </button>
             </article>
           ))}
         </div>
+      )}
+
+      {deleteError && (
+        <p className="error-message" role="alert">
+          {deleteError}
+        </p>
       )}
 
       <div className="home-actions">

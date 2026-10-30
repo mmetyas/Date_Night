@@ -26,3 +26,13 @@ export async function createInvitation(invitationData) {
 
   return response.json();
 }
+
+export async function deleteInvitation(invitationId) {
+  const response = await fetch(`${API_URL}/${invitationId}`, {
+    method: 'DELETE',
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to delete invitation.');
+  }
+}
