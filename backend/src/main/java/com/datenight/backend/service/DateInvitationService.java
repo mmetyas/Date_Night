@@ -46,4 +46,21 @@ public class DateInvitationService {
 
         dateInvitationRepository.delete(invitation);
     }
+
+    public DateInvitation updateInvitation(
+            Long invitationId,
+            CreateInvitationRequest request) {
+
+        DateInvitation invitation = dateInvitationRepository
+                .findById(invitationId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Invitation not found"
+                ));
+
+        invitation.setRestaurantName(request.getRestaurantName());
+        invitation.setSelectedDate(request.getSelectedDate());
+
+        return dateInvitationRepository.save(invitation);
+    }
 }
