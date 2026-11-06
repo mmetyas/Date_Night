@@ -1,282 +1,122 @@
-
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import PageLayout from '../Components/PageLayout';
-
-import {
-  getAllInvitations,
-  updateInvitation,
-  deleteInvitation,
-} from '../services/invitationService';
+import PageLayout from '../components/PageLayout';
+import { getAllInvitations, updateInvitation, deleteInvitation } from '../services/invitationService';
 
 function InvitationsPage() {
-  // Invitations loaded from the backend
   const [invitations, setInvitations] = useState([]);
-
-  // Loading states
   const [isLoading, setIsLoading] = useState(true);
-  const [savingId, setSavingId] = useState(null);
-  const [deletingId, setDeletingId] = useState(null);
-
-  // Error and success messages
   const [loadError, setLoadError] = useState('');
   const [actionError, setActionError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-
-  // Edit form state
   const [editingId, setEditingId] = useState(null);
-  const [editForm, setEditForm] = useState({
-    restaurantName: '',
-    selectedDate: '',
-  });
+  const [savingId, setSavingId] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
+  const [editForm, setEditForm] = useState({ restaurantName: '', selectedDate: '' });
 
-  // Fetch invitations when the page loads
   useEffect(() => {
-    async function fetchInvitations() {
+    async function loadInvitations() {
       try {
-        const data = await getAllInvitations();
-        setInvitations(data);
+        setInvitations(await getAllInvitations());
       } catch (error) {
         console.error('Error fetching invitations:', error);
-        setLoadError(
-          'Could not load your planned dates. Please try again.'
-        );
+        setLoadError('We couldn’t load your plans. Check that the server is running and try again.');
       } finally {
         setIsLoading(false);
       }
     }
-
-    fetchInvitations();
+    loadInvitations();
   }, []);
 
-  // Open edit mode and fill the form
-  function handleEditClick(invitation) {
+  function startEditing(invitation) {
     setEditingId(invitation.id);
-
-    setEditForm({
-      restaurantName: invitation.restaurantName,
-      selectedDate: invitation.selectedDate,
-    });
-
+    setEditForm({ restaurantName: invitation.restaurantName, selectedDate: invitation.selectedDate });
     setActionError('');
     setSuccessMessage('');
   }
 
-  // Update form fields
-  function handleEditChange(event) {
-    const { name, value } = event.target;
-
-    setEditForm((currentForm) => ({
-      ...currentForm,
-      [name]: value,
-    }));
-  }
-
-  // Cancel editing
-  function handleCancelEdit() {
+  function cancelEditing() {
     setEditingId(null);
-
-    setEditForm({
-      restaurantName: '',
-      selectedDate: '',
-    });
-
+    setEditForm({ restaurantName: '', selectedDate: '' });
     setActionError('');
   }
 
-  // Save invitation changes
-  async function handleUpdateInvitation(event) {
-    event.preventDefault();
+  function handleFormChange(event) {
+    const { name, value } = event.target;
+    setEditForm((current) => ({ ...current, [name]: value }));
+  }
 
+  async function handleUpdate(event) {
+    event.preventDefault();
     if (!editForm.restaurantName.trim() || !editForm.selectedDate) {
-      setActionError('Please fill in all fields.');
+      setActionError('Please complete both fields.');
       return;
     }
-
     setSavingId(editingId);
     setActionError('');
     setSuccessMessage('');
-
     try {
-      const updatedInvitation = await updateInvitation(
-        editingId,
-        {
-          restaurantName: editForm.restaurantName.trim(),
-          selectedDate: editForm.selectedDate,
-        }
-      );
-
-      setInvitations((currentInvitations) =>
-        currentInvitations.map((invitation) =>
-          invitation.id === editingId
-            ? updatedInvitation
-            : invitation
-        )
-      );
-
+      const updated = await updateInvitation(editingId, { restaurantName: editForm.restaurantName.trim(), selectedDate: editForm.selectedDate });
+      setInvitations((current) => current.map((item) => item.id === editingId ? updated : item));
       setEditingId(null);
-
-      setEditForm({
-        restaurantName: '',
-        selectedDate: '',
-      });
-
-      setSuccessMessage('Your date was updated successfully! ❤️');
+      setSuccessMessage('Your date has been updated. ♥');
     } catch (error) {
       console.error('Error updating invitation:', error);
-      setActionError(
-        'Could not update this date. Please try again.'
-      );
+      setActionError('We couldn’t update this date. Please try again.');
     } finally {
       setSavingId(null);
     }
   }
 
-  // Delete invitation
-  async function handleDeleteInvitation(invitationId) {
-    const confirmed = window.confirm(
-      'Are you sure you want to delete this date?'
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
-    setDeletingId(invitationId);
+  async function handleDelete(id) {
+    if (!window.confirm('Delete this planned date?')) return;
+    setDeletingId(id);
     setActionError('');
     setSuccessMessage('');
-
     try {
-      await deleteInvitation(invitationId);
-
-      setInvitations((currentInvitations) =>
-        currentInvitations.filter(
-          (invitation) => invitation.id !== invitationId
-        )
-      );
-
-      if (editingId === invitationId) {
-        handleCancelEdit();
-      }
-
-      setSuccessMessage('Your date was deleted successfully.');
+      await deleteInvitation(id);
+      setInvitations((current) => current.filter((item) => item.id !== id));
+      if (editingId === id) cancelEditing();
+      setSuccessMessage('The date was removed from your plans.');
     } catch (error) {
       console.error('Error deleting invitation:', error);
-      setActionError(
-        'Could not delete this date. Please try again.'
-      );
+      setActionError('We couldn’t delete this date. Please try again.');
     } finally {
       setDeletingId(null);
     }
   }
 
   return (
-    <PageLayout>
-      <h1>Our Planned Dates 💕</h1>
-
-      <p className="invitation-message">
-        Every date is another beautiful memory waiting to happen.
-      </p>
+    <PageLayout pageLabel="A collection of moments to look forward to">
+      <section className="page-heading page-heading-row">
+        <div><p className="eyebrow">THE LITTLE THINGS WE PLANNED</p><h1>Our <em>dates.</em></h1><p>Every plan is a memory waiting to happen.</p></div>
+        <Link to="/restaurants" className="button button-dark">Plan another date ↗</Link>
+      </section>
 
       {isLoading ? (
-        <p>Loading our plans...</p>
+        <div className="state-panel"><span className="loader" /><p>Gathering your plans…</p></div>
       ) : loadError ? (
-        <p className="error-message" role="alert">
-          {loadError}
-        </p>
+        <div className="state-panel state-error"><h2>Something went wrong</h2><p>{loadError}</p></div>
       ) : invitations.length === 0 ? (
-        <div className="empty-state">
-          <h2>No dates planned yet 💌</h2>
-          <p>Let's create our first special date!</p>
-        </div>
+        <div className="empty-panel"><span className="empty-icon">♡</span><p className="eyebrow">A FRESH PAGE</p><h2>Nothing planned <em>just yet.</em></h2><p>Your next lovely evening starts with a place and a date.</p><Link to="/restaurants" className="button button-dark">Plan your first date ↗</Link></div>
       ) : (
-        <div className="saved-invitations-list">
-          {invitations.map((invitation) => (
-            <article
-              className="saved-invitation-card"
-              key={invitation.id}
-            >
+        <div className="plans-grid">
+          {invitations.map((invitation, index) => (
+            <article className="plan-card" key={invitation.id}>
+              <div className="plan-card-top"><span>DATE NOTE · {String(index + 1).padStart(2, '0')}</span><span className="plan-heart">♥</span></div>
               {editingId === invitation.id ? (
-                <form
-                  className="edit-invitation-form"
-                  onSubmit={handleUpdateInvitation}
-                >
-                  <h2>Edit Our Date ✏️</h2>
-
-                  <label htmlFor={`restaurant-${invitation.id}`}>
-                    Restaurant Name
-                  </label>
-
-                  <input
-                    id={`restaurant-${invitation.id}`}
-                    type="text"
-                    name="restaurantName"
-                    value={editForm.restaurantName}
-                    onChange={handleEditChange}
-                    required
-                  />
-
-                  <label htmlFor={`date-${invitation.id}`}>
-                    Date
-                  </label>
-
-                  <input
-                    id={`date-${invitation.id}`}
-                    type="date"
-                    name="selectedDate"
-                    value={editForm.selectedDate}
-                    onChange={handleEditChange}
-                    required
-                  />
-
-                  <div className="invitation-actions">
-                    <button
-                      type="submit"
-                      className="save-button"
-                      disabled={savingId === invitation.id}
-                    >
-                      {savingId === invitation.id
-                        ? 'Saving...'
-                        : 'Save Changes ❤️'}
-                    </button>
-
-                    <button
-                      type="button"
-                      className="cancel-button"
-                      onClick={handleCancelEdit}
-                      disabled={savingId === invitation.id}
-                    >
-                      Cancel
-                    </button>
-                  </div>
+                <form className="edit-form" onSubmit={handleUpdate}>
+                  <h2>Edit this <em>plan.</em></h2>
+                  <label className="field-label">Place<input name="restaurantName" value={editForm.restaurantName} onChange={handleFormChange} required maxLength={100} /></label>
+                  <label className="field-label">Date<input type="date" name="selectedDate" value={editForm.selectedDate} onChange={handleFormChange} required /></label>
+                  <div className="plan-actions"><button className="button button-dark" type="submit" disabled={savingId === invitation.id}>{savingId === invitation.id ? 'Saving…' : 'Save changes'}</button><button className="button button-quiet" type="button" onClick={cancelEditing} disabled={savingId === invitation.id}>Cancel</button></div>
                 </form>
               ) : (
                 <>
+                  <p className="eyebrow">OUR NEXT LITTLE ADVENTURE</p>
                   <h2>{invitation.restaurantName}</h2>
-
-                  <p>📅 Date: {invitation.selectedDate}</p>
-
-                  <div className="invitation-actions">
-                    <button
-                      className="edit-button"
-                      onClick={() => handleEditClick(invitation)}
-                      disabled={deletingId === invitation.id}
-                    >
-                      Edit ✏️
-                    </button>
-
-                    <button
-                      className="delete-button"
-                      onClick={() =>
-                        handleDeleteInvitation(invitation.id)
-                      }
-                      disabled={deletingId === invitation.id}
-                    >
-                      {deletingId === invitation.id
-                        ? 'Deleting...'
-                        : 'Delete 🗑️'}
-                    </button>
-                  </div>
+                  <div className="plan-date"><span>✳</span><div><small>MARK YOUR CALENDAR</small><b>{invitation.selectedDate}</b></div></div>
+                  <div className="plan-actions"><button className="button button-outline" onClick={() => startEditing(invitation)}>Edit plan ↗</button><button className="button button-danger-quiet" onClick={() => handleDelete(invitation.id)} disabled={deletingId === invitation.id}>{deletingId === invitation.id ? 'Removing…' : 'Delete'}</button></div>
                 </>
               )}
             </article>
@@ -284,27 +124,9 @@ function InvitationsPage() {
         </div>
       )}
 
-      {actionError && (
-        <p className="error-message" role="alert">
-          {actionError}
-        </p>
-      )}
-
-      {successMessage && (
-        <p className="success-message" role="status">
-          {successMessage}
-        </p>
-      )}
-
-      <div className="home-actions">
-        <Link to="/restaurants" className="invitation-button">
-          Plan Another Date ❤️
-        </Link>
-
-        <Link to="/" className="invitation-button">
-          Back to Home
-        </Link>
-      </div>
+      {actionError && <p className="feedback feedback-error" role="alert">{actionError}</p>}
+      {successMessage && <p className="feedback feedback-success" role="status">{successMessage}</p>}
+      <div className="back-link-wrap"><Link to="/" className="text-link">← Back home</Link></div>
     </PageLayout>
   );
 }

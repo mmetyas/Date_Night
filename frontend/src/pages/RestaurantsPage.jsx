@@ -1,11 +1,9 @@
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import RestaurantCard from '../Components/RestaurantCard';
-import PageLayout from '../Components/PageLayout';
+import RestaurantCard from '../components/RestaurantCard';
+import PageLayout from '../components/PageLayout';
 import restaurants from '../data/restaurants';
-//import { createInvitation } from '../services/invitationService';
-import { createInvitation } from '../Services/invitationService';
+import { createInvitation } from '../services/invitationService';
 
 function RestaurantsPage() {
   const [selectedRestaurantId, setSelectedRestaurantId] = useState(null);
@@ -14,9 +12,7 @@ function RestaurantsPage() {
   const [saveError, setSaveError] = useState('');
   const [invitationConfirmed, setInvitationConfirmed] = useState(false);
 
-  const selectedRestaurant = restaurants.find(
-    (restaurant) => restaurant.id === selectedRestaurantId
-  );
+  const selectedRestaurant = restaurants.find((restaurant) => restaurant.id === selectedRestaurantId);
 
   function handleSelectRestaurant(restaurantId) {
     setSelectedRestaurantId(restaurantId);
@@ -24,100 +20,52 @@ function RestaurantsPage() {
     setSaveError('');
   }
 
-  async function handleConfirmInvitation() {
-    if (!selectedRestaurant || !selectedDate) {
-      return;
-    }
+  async function handleConfirmInvitation(event) {
+    event.preventDefault();
+    if (!selectedRestaurant || !selectedDate) return;
 
     setIsSaving(true);
     setSaveError('');
     setInvitationConfirmed(false);
 
     try {
-      await createInvitation({
-        restaurantName: selectedRestaurant.name,
-        selectedDate,
-      });
-
+      await createInvitation({ restaurantName: selectedRestaurant.name, selectedDate });
       setInvitationConfirmed(true);
     } catch (error) {
       console.error('Error saving invitation:', error);
-      setSaveError('Could not save your invitation. Please try again.');
+      setSaveError('We couldn’t save your date. Please try again.');
     } finally {
       setIsSaving(false);
     }
   }
 
   return (
-    <PageLayout>
-      <h1>Plan Our Date ❤️</h1>
+    <PageLayout pageLabel="Choose the setting for your next memory">
+      <section className="page-heading">
+        <p className="eyebrow">FIRST, THE WHERE</p>
+        <h1>Where shall we <em>go?</em></h1>
+        <p>Pick the kind of evening that feels just right. You can choose the day below.</p>
+      </section>
 
-      <p className="invitation-message">
-        Choose our restaurant and the date for our special night.
-      </p>
-
-      <div className="restaurant-section">
-        <h2 className="restaurant-section-title">
-          Where should we go?
-        </h2>
-
-        <div className="restaurant-list">
-          {restaurants.map((restaurant) => (
-            <RestaurantCard
-              key={restaurant.id}
-              restaurant={restaurant}
-              onSelect={handleSelectRestaurant}
-              isSelected={selectedRestaurantId === restaurant.id}
-            />
-          ))}
-        </div>
-
-        <div className="date-section">
-          <h2>When should we go? 📅</h2>
-
-          <label htmlFor="date-night-date">
-            Choose our special date
-          </label>
-
-          <input
-            id="date-night-date"
-            type="date"
-            value={selectedDate}
-            min={new Date().toLocaleDateString('en-CA')}
-            onChange={(event) => {
-              setSelectedDate(event.target.value);
-              setInvitationConfirmed(false);
-              setSaveError('');
-            }}
-          />
-        </div>
-
-        <button
-          className="invitation-button confirm-button"
-          onClick={handleConfirmInvitation}
-          disabled={!selectedRestaurant || !selectedDate || isSaving}
-        >
-          {isSaving ? 'Saving...' : 'Confirm Our Date ❤️'}
-        </button>
-
-        {saveError && (
-          <p className="error-message" role="alert">
-            {saveError}
-          </p>
-        )}
-
-        {invitationConfirmed && (
-          <div className="confirmation-message">
-            <h2>It's a Date! ❤️</h2>
-            <p>We're going to {selectedRestaurant.name}!</p>
-            <p>Our date: {selectedDate}</p>
-            <p>Can't wait to spend this time with you!</p>
-            <Link to="/invitations">View our planned dates</Link>
-          </div>
-        )}
+      <div className="restaurant-grid">
+        {restaurants.map((restaurant) => (
+          <RestaurantCard key={restaurant.id} restaurant={restaurant} onSelect={handleSelectRestaurant} isSelected={selectedRestaurantId === restaurant.id} />
+        ))}
       </div>
 
-      <Link to="/">Back to Home</Link>
+      <form className="booking-panel" onSubmit={handleConfirmInvitation}>
+        <div className="booking-intro"><span className="section-number">02</span><div><p className="eyebrow">THEN, THE WHEN</p><h2>Save the <em>date.</em></h2><p>A day to look forward to.</p></div></div>
+        <div className="booking-controls">
+          <label className="field-label" htmlFor="date-night-date">Our date
+            <input id="date-night-date" type="date" value={selectedDate} min={new Date().toLocaleDateString('en-CA')} onChange={(event) => { setSelectedDate(event.target.value); setInvitationConfirmed(false); setSaveError(''); }} required />
+          </label>
+          <button className="button button-dark" type="submit" disabled={!selectedRestaurant || !selectedDate || isSaving}>{isSaving ? 'Saving your date…' : 'Make it a date ↗'}</button>
+        </div>
+        {!selectedRestaurant && <p className="form-hint">Choose a place above to continue.</p>}
+        {saveError && <p className="feedback feedback-error" role="alert">{saveError}</p>}
+        {invitationConfirmed && <div className="feedback feedback-success" role="status"><b>It’s a date. ♥</b> {selectedRestaurant.name} is on the calendar for {selectedDate}. <Link to="/invitations">View our plans →</Link></div>}
+      </form>
+      <div className="back-link-wrap"><Link to="/" className="text-link">← Back home</Link></div>
     </PageLayout>
   );
 }
