@@ -292,3 +292,154 @@ h1 span {
   color: #e74c3c;
   margin-top: 12px;
 }
+
+
+/* Invitation action buttons */
+
+.invitation-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.edit-button,
+.delete-button,
+.save-button,
+.cancel-button {
+  border: none;
+  border-radius: 8px;
+  padding: 11px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.edit-button:hover,
+.delete-button:hover,
+.save-button:hover,
+.cancel-button:hover {
+  transform: translateY(-2px);
+}
+
+.edit-button {
+  background-color: #f0c987;
+  color: #513b25;
+}
+
+.edit-button:hover {
+  background-color: #e7b96d;
+}
+
+.delete-button {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.delete-button:hover {
+  background-color: #c0392b;
+}
+
+.save-button {
+  background-color: #7d9b76;
+  color: white;
+}
+
+.save-button:hover {
+  background-color: #66835f;
+}
+
+.cancel-button {
+  background-color: #e8e2df;
+  color: #51443e;
+}
+
+.cancel-button:hover {
+  background-color: #d9d0cb;
+}
+
+.edit-button:disabled,
+.delete-button:disabled,
+.save-button:disabled,
+.cancel-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Edit invitation form */
+
+.edit-invitation-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+}
+
+.edit-invitation-form h2 {
+  margin-bottom: 8px;
+}
+
+.edit-invitation-form label {
+  font-weight: 600;
+  color: #51443e;
+}
+
+.edit-invitation-form input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  border: 1px solid #d8c9c0;
+  border-radius: 8px;
+  font-size: 15px;
+  background-color: #fff;
+  color: #333;
+}
+
+.edit-invitation-form input:focus {
+  outline: none;
+  border-color: #b77b83;
+  box-shadow: 0 0 0 3px rgba(183, 123, 131, 0.15);
+}
+
+/* Feedback messages */
+
+.success-message {
+  color: #477747;
+  background-color: #edf6eb;
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 16px;
+}
+
+.error-message {
+  color: #c0392b;
+  background-color: #fcebea;
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 16px;
+}
+
+/* Empty state */
+
+.empty-state {
+  padding: 25px 15px;
+  text-align: center;
+}
+
+/* Mobile responsiveness */
+
+@media (max-width: 600px) {
+  .invitation-actions {
+    flex-direction: column;
+  }
+
+  .invitation-actions button {
+    width: 100%;
+  }
+
+  .edit-invitation-form input {
+    font-size: 16px;
+  }
+}
