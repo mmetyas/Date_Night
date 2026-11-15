@@ -2,12 +2,15 @@
 package com.datenight.backend.service;
 
 import com.datenight.backend.dto.CreateInvitationRequest;
+import com.datenight.backend.dto.InvitationResponseRequest;
 import com.datenight.backend.entity.DateInvitation;
 import com.datenight.backend.repository.DateInvitationRepository;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -60,6 +63,65 @@ public class DateInvitationService {
 
         invitation.setRestaurantName(request.getRestaurantName());
         invitation.setSelectedDate(request.getSelectedDate());
+
+        return dateInvitationRepository.save(invitation);
+    }
+
+    // Get an invitation using its public token
+    public DateInvitation getInvitationByToken(String token) {
+
+        return dateInvitationRepository
+                .findByInvitationToken(token)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Invitation not found"
+                ));
+    }
+
+    // Save the wife's response
+    public DateInvitation respondToInvitation(
+            String token,
+            InvitationResponseRequest request) {
+
+        DateInvitation invitation = getInvitationByToken(token);
+
+        if (!"PENDING".equals(invitation.getStatus())) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "This invitation has already been answered"
+            );
+        }
+
+        String status = request.getStatus();
+
+        if (!"ACCEPTED".equals(status)
+                && !"DECLINED".equals(status)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Invalid invitation status"
+            );
+        }
+
+        if ("ACCEPTED".equals(status)) {
+
+            if (request.getRestaurantName() == null
+                    || request.getRestaurantName().isBlank()) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Please select a restaurant"
+                );
+            }
+
+            invitation.setRespondedRestaurant(
+                    request.getRestaurantName()
+            );
+
+        } else {
+            invitation.setRespondedRestaurant(null);
+        }
+
+        invitation.setStatus(status);
+        invitation.setRespondedAt(LocalDateTime.now());
 
         return dateInvitationRepository.save(invitation);
     }
