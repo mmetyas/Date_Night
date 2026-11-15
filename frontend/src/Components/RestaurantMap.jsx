@@ -1,12 +1,16 @@
 
+import { useEffect, useRef } from 'react';
+
 import {
   MapContainer,
   TileLayer,
   Marker,
   Popup,
+  useMap,
 } from 'react-leaflet';
 
 import L from 'leaflet';
+
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -24,9 +28,59 @@ const restaurantMarkerIcon = L.icon({
   shadowSize: [41, 41],
 });
 
+function MapController({
+  restaurants,
+  selectedRestaurant,
+  markerRefs,
+}) {
+  const map = useMap();
 
-function RestaurantMap({ restaurants }) {
-  const mapCenter = [30.025, 31.0];
+  // Fit all restaurants when the map first loads.
+  useEffect(() => {
+    if (!restaurants.length) return;
+
+    const bounds = L.latLngBounds(
+      restaurants.map((restaurant) => [
+        restaurant.latitude,
+        restaurant.longitude,
+      ])
+    );
+
+    map.fitBounds(bounds, {
+      padding: [40, 40],
+      maxZoom: 13,
+    });
+  }, [map, restaurants]);
+
+  // Move to the selected restaurant and open its popup.
+  useEffect(() => {
+    if (!selectedRestaurant) return;
+
+    const position = [
+      selectedRestaurant.latitude,
+      selectedRestaurant.longitude,
+    ];
+
+    map.flyTo(position, 15, {
+      duration: 1,
+    });
+
+    markerRefs.current[selectedRestaurant.id]?.openPopup();
+  }, [map, selectedRestaurant, markerRefs]);
+
+  return null;
+}
+
+function RestaurantMap({
+  restaurants,
+  selectedRestaurantId,
+  onSelectRestaurant,
+}) {
+  const markerRefs = useRef({});
+
+  const selectedRestaurant = restaurants.find(
+    (restaurant) => restaurant.id === selectedRestaurantId
+  );
 
   function getDirectionsUrl(restaurant) {
     const destination = `${restaurant.name}, ${restaurant.address}`;
@@ -38,7 +92,9 @@ function RestaurantMap({ restaurants }) {
     <section className="restaurant-map-section">
       <div className="restaurant-map-heading">
         <p className="eyebrow">EXPLORE THE AREA</p>
-        <h2>Find your <em>place.</em></h2>
+        <h2>
+          Find your <em>place.</em>
+        </h2>
         <p>
           Explore our selected restaurants across Sheikh Zayed
           and 6th of October.
@@ -47,7 +103,7 @@ function RestaurantMap({ restaurants }) {
 
       <div className="restaurant-map-container">
         <MapContainer
-          center={mapCenter}
+          center={[30.025, 31.0]}
           zoom={13}
           scrollWheelZoom={false}
           className="restaurant-map"
@@ -55,6 +111,12 @@ function RestaurantMap({ restaurants }) {
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+
+          <MapController
+            restaurants={restaurants}
+            selectedRestaurant={selectedRestaurant}
+            markerRefs={markerRefs}
           />
 
           {restaurants.map((restaurant) => (
@@ -65,6 +127,12 @@ function RestaurantMap({ restaurants }) {
                 restaurant.longitude,
               ]}
               icon={restaurantMarkerIcon}
+              ref={(marker) => {
+                markerRefs.current[restaurant.id] = marker;
+              }}
+              eventHandlers={{
+                click: () => onSelectRestaurant(restaurant.id),
+              }}
             >
               <Popup>
                 <div className="restaurant-map-popup">
@@ -72,11 +140,9 @@ function RestaurantMap({ restaurants }) {
 
                   <p>{restaurant.address}</p>
 
-                  {restaurant.coordinatesAreApproximate && (
-                    <small>
-                      Map pin shows an approximate area.
-                    </small>
-                  )}
+                  <small>
+                    Approximate map location
+                  </small>
 
                   <a
                     href={getDirectionsUrl(restaurant)}
@@ -94,8 +160,7 @@ function RestaurantMap({ restaurants }) {
 
       <p className="restaurant-map-note">
         Map data © OpenStreetMap contributors.
-        Restaurant pins are approximate; use Get Directions
-        to find the exact business listing.
+        Restaurant pins are approximate.
       </p>
     </section>
   );

@@ -74,7 +74,12 @@ function RestaurantsPage() {
         ))}
       </div>
 
-      <RestaurantMap restaurants={restaurants} />
+
+<RestaurantMap
+  restaurants={restaurants}
+  selectedRestaurantId={selectedRestaurantId}
+  onSelectRestaurant={handleSelectRestaurant}
+/>
 
       <form className="booking-panel" onSubmit={handleConfirmInvitation}>
         <div className="booking-intro">
