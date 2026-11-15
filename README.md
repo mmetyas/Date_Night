@@ -18,7 +18,7 @@ This application allows me to invite my wife on a date and let her choose her fa
 
 - Frontend: React
 - Backend: Java and Spring Boot
-- Database: To be decided
+- Database: H2
 - Version Control: Git and GitHub
 
 ## Project Status
