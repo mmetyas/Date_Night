@@ -7,14 +7,17 @@ import PageLayout from '../components/PageLayout';
 import RestaurantMap from '../components/RestaurantMap';
 
 import restaurants from '../data/restaurants';
-import { createInvitation } from '../services/invitationService';
+import { createInvitation } from '../services/invitationService'
 
 function RestaurantsPage() {
   const [selectedRestaurantId, setSelectedRestaurantId] = useState(null);
   const [selectedDate, setSelectedDate] = useState('');
+
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
-  const [invitationConfirmed, setInvitationConfirmed] = useState(false);
+
+  const [createdInvitation, setCreatedInvitation] = useState(null);
+  const [linkCopied, setLinkCopied] = useState(false);
 
   const selectedRestaurant = restaurants.find(
     (restaurant) => restaurant.id === selectedRestaurantId
@@ -22,26 +25,30 @@ function RestaurantsPage() {
 
   function handleSelectRestaurant(restaurantId) {
     setSelectedRestaurantId(restaurantId);
-    setInvitationConfirmed(false);
+    setCreatedInvitation(null);
+    setLinkCopied(false);
     setSaveError('');
   }
 
   async function handleConfirmInvitation(event) {
     event.preventDefault();
 
-    if (!selectedRestaurant || !selectedDate) return;
+    if (!selectedRestaurant || !selectedDate) {
+      return;
+    }
 
     setIsSaving(true);
     setSaveError('');
-    setInvitationConfirmed(false);
+    setCreatedInvitation(null);
+    setLinkCopied(false);
 
     try {
-      await createInvitation({
+      const invitation = await createInvitation({
         restaurantName: selectedRestaurant.name,
         selectedDate,
       });
 
-      setInvitationConfirmed(true);
+      setCreatedInvitation(invitation);
     } catch (error) {
       console.error('Error saving invitation:', error);
       setSaveError('We couldn’t save your date. Please try again.');
@@ -50,13 +57,39 @@ function RestaurantsPage() {
     }
   }
 
+  async function handleCopyInvitationLink() {
+    if (!createdInvitation?.invitationToken) {
+      return;
+    }
+
+    const invitationLink =
+      `${window.location.origin}/invite/${createdInvitation.invitationToken}`;
+
+    try {
+      await navigator.clipboard.writeText(invitationLink);
+      setLinkCopied(true);
+      setSaveError('');
+    } catch (error) {
+      console.error('Could not copy invitation link:', error);
+      setSaveError(
+        'Could not copy the link. Please copy it from the address below.'
+      );
+    }
+  }
+
+  const invitationLink = createdInvitation?.invitationToken
+    ? `${window.location.origin}/invite/${createdInvitation.invitationToken}`
+    : '';
+
   return (
     <PageLayout pageLabel="Choose the setting for your next memory">
       <section className="page-heading">
         <p className="eyebrow">FIRST, THE WHERE</p>
+
         <h1>
           Where shall we <em>go?</em>
         </h1>
+
         <p>
           Pick the kind of evening that feels just right.
           You can choose the day below.
@@ -74,12 +107,11 @@ function RestaurantsPage() {
         ))}
       </div>
 
-
-<RestaurantMap
-  restaurants={restaurants}
-  selectedRestaurantId={selectedRestaurantId}
-  onSelectRestaurant={handleSelectRestaurant}
-/>
+      <RestaurantMap
+        restaurants={restaurants}
+        selectedRestaurantId={selectedRestaurantId}
+        onSelectRestaurant={handleSelectRestaurant}
+      />
 
       <form className="booking-panel" onSubmit={handleConfirmInvitation}>
         <div className="booking-intro">
@@ -87,9 +119,11 @@ function RestaurantsPage() {
 
           <div>
             <p className="eyebrow">THEN, THE WHEN</p>
+
             <h2>
               Save the <em>date.</em>
             </h2>
+
             <p>A day to look forward to.</p>
           </div>
         </div>
@@ -105,7 +139,8 @@ function RestaurantsPage() {
               min={new Date().toLocaleDateString('en-CA')}
               onChange={(event) => {
                 setSelectedDate(event.target.value);
-                setInvitationConfirmed(false);
+                setCreatedInvitation(null);
+                setLinkCopied(false);
                 setSaveError('');
               }}
               required
@@ -133,11 +168,26 @@ function RestaurantsPage() {
           </p>
         )}
 
-        {invitationConfirmed && (
+        {createdInvitation && (
           <div className="feedback feedback-success" role="status">
-            <b>It’s a date. ♥</b> {selectedRestaurant.name} is on
-            the calendar for {selectedDate}.{' '}
-            <Link to="/invitations">View our plans →</Link>
+            <b>It’s a date. ♥</b>
+
+            <p>
+              Your invitation is ready! Send this private link
+              to your wife so she can choose her restaurant and respond.
+            </p>
+
+            <button
+              type="button"
+              className="button button-dark"
+              onClick={handleCopyInvitationLink}
+            >
+              {linkCopied ? 'Link copied ✓' : 'Copy invitation link ↗'}
+            </button>
+
+            <p className="invitation-link-text">
+              {invitationLink}
+            </p>
           </div>
         )}
       </form>

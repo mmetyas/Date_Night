@@ -56,3 +56,39 @@ export async function deleteInvitation(invitationId) {
     throw new Error('Failed to delete invitation.');
   }
 }
+
+// GET: Retrieve a public invitation using its token
+export async function getPublicInvitation(token) {
+  const response = await fetch(
+    `${API_URL}/public/${encodeURIComponent(token)}`
+  );
+
+  if (!response.ok) {
+    throw new Error('Invitation not found or unavailable.');
+  }
+
+  return response.json();
+}
+
+// POST: Submit a response to a public invitation
+export async function respondToPublicInvitation(token, responseData) {
+  const response = await fetch(
+    `${API_URL}/public/${encodeURIComponent(token)}/respond`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(responseData),
+    }
+  );
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(
+      errorData?.message || 'Failed to submit your response.'
+    );
+  }
+
+  return response.json();
+}

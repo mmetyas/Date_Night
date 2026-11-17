@@ -178,3 +178,49 @@ button, input { font-family: var(--sans); }
   .plan-actions { display: grid; grid-template-columns: 1fr 1fr; }
   .plan-actions .button { width: 100%; }
 }
+
+
+/* Public Invitation Page */
+
+.invitation-result {
+  text-align: center;
+  margin-top: 32px;
+}
+
+.invitation-result h2 {
+  margin-bottom: 12px;
+}
+
+.invitation-actions {
+  margin-top: 40px;
+}
+
+.invitation-actions h2 {
+  margin-bottom: 24px;
+}
+
+.invitation-actions .booking-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.invitation-actions .button {
+  flex: 1;
+}
+
+.invitation-link-text {
+  margin-top: 16px;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+}
+
+@media (max-width: 640px) {
+  .invitation-actions .booking-controls {
+    flex-direction: column;
+  }
+
+  .invitation-actions .button {
+    width: 100%;
+  }
+}
