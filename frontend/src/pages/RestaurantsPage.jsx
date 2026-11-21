@@ -5,16 +5,24 @@ import { Link } from 'react-router-dom';
 import RestaurantCard from '../components/RestaurantCard';
 import PageLayout from '../components/PageLayout';
 import RestaurantMap from '../components/RestaurantMap';
+import AdminKeyPrompt from '../components/AdminKeyPrompt';
 
 import restaurants from '../data/restaurants';
-import { createInvitation } from '../services/invitationService'
+import {
+  AdminKeyError,
+  createInvitation,
+  getInvitationLink,
+} from '../services/invitationService';
 
 function RestaurantsPage() {
   const [selectedRestaurantId, setSelectedRestaurantId] = useState(null);
   const [selectedDate, setSelectedDate] = useState('');
+  const [guestName, setGuestName] = useState('');
+  const [personalMessage, setPersonalMessage] = useState('');
 
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
+  const [needsAdminKey, setNeedsAdminKey] = useState(false);
 
   const [createdInvitation, setCreatedInvitation] = useState(null);
   const [linkCopied, setLinkCopied] = useState(false);
@@ -30,9 +38,7 @@ function RestaurantsPage() {
     setSaveError('');
   }
 
-  async function handleConfirmInvitation(event) {
-    event.preventDefault();
-
+  async function saveInvitation() {
     if (!selectedRestaurant || !selectedDate) {
       return;
     }
@@ -46,10 +52,16 @@ function RestaurantsPage() {
       const invitation = await createInvitation({
         restaurantName: selectedRestaurant.name,
         selectedDate,
+        guestName: guestName.trim(),
+        personalMessage: personalMessage.trim(),
       });
 
       setCreatedInvitation(invitation);
     } catch (error) {
+      if (error instanceof AdminKeyError) {
+        setNeedsAdminKey(true);
+        return;
+      }
       console.error('Error saving invitation:', error);
       setSaveError('We couldn’t save your date. Please try again.');
     } finally {
@@ -57,13 +69,20 @@ function RestaurantsPage() {
     }
   }
 
+  function handleConfirmInvitation(event) {
+    event.preventDefault();
+    saveInvitation();
+  }
+
+  function handleAdminKeySaved() {
+    setNeedsAdminKey(false);
+    saveInvitation();
+  }
+
   async function handleCopyInvitationLink() {
     if (!createdInvitation?.invitationToken) {
       return;
     }
-
-    const invitationLink =
-      `${window.location.origin}/invite/${createdInvitation.invitationToken}`;
 
     try {
       await navigator.clipboard.writeText(invitationLink);
@@ -77,9 +96,7 @@ function RestaurantsPage() {
     }
   }
 
-  const invitationLink = createdInvitation?.invitationToken
-    ? `${window.location.origin}/invite/${createdInvitation.invitationToken}`
-    : '';
+  const invitationLink = getInvitationLink(createdInvitation?.invitationToken);
 
   return (
     <PageLayout pageLabel="Choose the setting for your next memory">
@@ -126,6 +143,32 @@ function RestaurantsPage() {
 
             <p>A day to look forward to.</p>
           </div>
+        </div>
+
+        <div className="personal-fields">
+          <label className="field-label" htmlFor="guest-name">
+            Her name (optional)
+            <input
+              id="guest-name"
+              type="text"
+              maxLength={50}
+              value={guestName}
+              placeholder="She'll see “Happy Birthday, …!”"
+              onChange={(event) => setGuestName(event.target.value)}
+            />
+          </label>
+
+          <label className="field-label" htmlFor="personal-message">
+            A personal message (optional)
+            <textarea
+              id="personal-message"
+              rows={3}
+              maxLength={500}
+              value={personalMessage}
+              placeholder="A few words from the heart…"
+              onChange={(event) => setPersonalMessage(event.target.value)}
+            />
+          </label>
         </div>
 
         <div className="booking-controls">
@@ -191,6 +234,13 @@ function RestaurantsPage() {
           </div>
         )}
       </form>
+
+      {needsAdminKey && (
+        <AdminKeyPrompt
+          onSaved={handleAdminKeySaved}
+          message="Enter your secret key to create the invitation. It will be remembered on this device."
+        />
+      )}
 
       <div className="back-link-wrap">
         <Link to="/" className="text-link">

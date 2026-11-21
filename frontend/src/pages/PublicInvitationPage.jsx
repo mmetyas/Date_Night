@@ -1,6 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import confetti from 'canvas-confetti';
 
 import PageLayout from '../components/PageLayout';
 import RestaurantCard from '../components/RestaurantCard';
@@ -26,6 +27,25 @@ function formatInvitationDate(dateString) {
     month: 'long',
     day: 'numeric',
   });
+}
+
+function celebrate() {
+  if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+    return;
+  }
+
+  const colors = ['#b77e83', '#75434f', '#f3d6d0', '#e8c07d', '#ffffff'];
+  const end = Date.now() + 1800;
+
+  (function frame() {
+    confetti({ particleCount: 4, angle: 60, spread: 60, origin: { x: 0, y: 0.7 }, colors });
+    confetti({ particleCount: 4, angle: 120, spread: 60, origin: { x: 1, y: 0.7 }, colors });
+    if (Date.now() < end) {
+      requestAnimationFrame(frame);
+    }
+  })();
+
+  confetti({ particleCount: 120, spread: 90, origin: { y: 0.6 }, colors, shapes: ['circle', 'square'] });
 }
 
 function PublicInvitationPage() {
@@ -83,6 +103,10 @@ function PublicInvitationPage() {
       });
 
       setInvitation(response);
+
+      if (response.status === 'ACCEPTED') {
+        celebrate();
+      }
     } catch (err) {
       console.error('Error responding to invitation:', err);
 
@@ -96,9 +120,11 @@ function PublicInvitationPage() {
 
   if (isLoading) {
     return (
-      <PageLayout pageLabel="A little surprise">
+      <PageLayout pageLabel="A little surprise" minimal>
         <div className="state-panel">
-          Loading your invitation...
+          <span className="loader" />
+          <p>Preparing your surprise… ♥</p>
+          <p className="form-hint">This can take a few moments.</p>
         </div>
       </PageLayout>
     );
@@ -106,7 +132,7 @@ function PublicInvitationPage() {
 
   if (!invitation) {
     return (
-      <PageLayout pageLabel="A little surprise">
+      <PageLayout pageLabel="A little surprise" minimal>
         <div className="state-panel">
           <h2>Oops!</h2>
           <p>{error || 'Invitation not found.'}</p>
@@ -118,19 +144,32 @@ function PublicInvitationPage() {
   const hasResponded = invitation.status !== 'PENDING';
 
   return (
-    <PageLayout pageLabel="A little surprise">
+    <PageLayout pageLabel="A little surprise" minimal>
       <section className="page-heading">
         <p className="eyebrow">A SPECIAL INVITATION</p>
 
-        <h1>
-          Someone has a <em>date</em> in mind. ♥
-        </h1>
+        {invitation.guestName ? (
+          <h1>
+            Happy Birthday, <em>{invitation.guestName}!</em> ♥
+          </h1>
+        ) : (
+          <h1>
+            Someone has a <em>date</em> in mind. ♥
+          </h1>
+        )}
 
         <p>
           You're invited to a special evening.
           The only thing left is choosing where to go.
         </p>
       </section>
+
+      {invitation.personalMessage && (
+        <section className="love-note">
+          <span className="love-note-mark" aria-hidden="true">♥</span>
+          <p>{invitation.personalMessage}</p>
+        </section>
+      )}
 
       <section className="booking-panel">
         <p className="eyebrow">SAVE THE DATE</p>
