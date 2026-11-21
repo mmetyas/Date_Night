@@ -9,7 +9,7 @@ import AdminKeyPrompt from '../components/AdminKeyPrompt';
 
 import restaurants from '../data/restaurants';
 import {
-  AdminKeyError,
+  isAdminKeyError,
   createInvitation,
   getInvitationLink,
 } from '../services/invitationService';
@@ -58,7 +58,7 @@ function RestaurantsPage() {
 
       setCreatedInvitation(invitation);
     } catch (error) {
-      if (error instanceof AdminKeyError) {
+      if (isAdminKeyError(error)) {
         setNeedsAdminKey(true);
         return;
       }

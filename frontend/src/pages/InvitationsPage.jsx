@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import PageLayout from '../components/PageLayout';
 import AdminKeyPrompt from '../components/AdminKeyPrompt';
 import {
-  AdminKeyError,
+  isAdminKeyError,
   getAllInvitations,
   updateInvitation,
   deleteInvitation,
@@ -46,7 +46,7 @@ function InvitationsPage() {
       try {
         setInvitations(await getAllInvitations());
       } catch (error) {
-        if (error instanceof AdminKeyError) {
+        if (isAdminKeyError(error)) {
           setNeedsAdminKey(true);
         } else {
           console.error('Error fetching invitations:', error);
@@ -67,7 +67,7 @@ function InvitationsPage() {
   }
 
   function handleActionError(error, fallback) {
-    if (error instanceof AdminKeyError) {
+    if (isAdminKeyError(error)) {
       setNeedsAdminKey(true);
       return;
     }

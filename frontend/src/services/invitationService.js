@@ -10,6 +10,11 @@ export class AdminKeyError extends Error {
   }
 }
 
+// Name-based check: survives hot-reload creating a second copy of the class.
+export function isAdminKeyError(error) {
+  return error?.name === 'AdminKeyError';
+}
+
 export function getAdminKey() {
   try {
     return localStorage.getItem(ADMIN_KEY_STORAGE) || '';

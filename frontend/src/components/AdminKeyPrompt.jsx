@@ -26,6 +26,7 @@ function AdminKeyPrompt({ onSaved, message }) {
             id="admin-key"
             type="password"
             autoComplete="current-password"
+            autoFocus
             value={key}
             onChange={(event) => setKey(event.target.value)}
             required
