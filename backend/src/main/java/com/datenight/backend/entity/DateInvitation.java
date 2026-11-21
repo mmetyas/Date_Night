@@ -27,6 +27,12 @@ public class DateInvitation {
 
     private LocalDateTime respondedAt;
 
+    @Column(length = 50)
+    private String guestName;
+
+    @Column(length = 500)
+    private String personalMessage;
+
     public DateInvitation() {
     }
 
@@ -83,5 +89,21 @@ public class DateInvitation {
 
     public void setRespondedAt(LocalDateTime respondedAt) {
         this.respondedAt = respondedAt;
+    }
+
+    public String getGuestName() {
+        return guestName;
+    }
+
+    public void setGuestName(String guestName) {
+        this.guestName = guestName;
+    }
+
+    public String getPersonalMessage() {
+        return personalMessage;
+    }
+
+    public void setPersonalMessage(String personalMessage) {
+        this.personalMessage = personalMessage;
     }
 }

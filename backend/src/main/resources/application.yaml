@@ -1,27 +1,30 @@
+server:
+  port: ${PORT:8080}
 
 spring:
   application:
     name: backend
 
   datasource:
-    url: jdbc:h2:file:./data/datenightdb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
+    # Local default: H2 file database. In production set DB_URL / DB_USERNAME / DB_PASSWORD
+    # e.g. DB_URL=jdbc:postgresql://<host>/<db>?sslmode=require
+    url: ${DB_URL:jdbc:h2:file:./data/datenightdb}
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:}
 
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
+    show-sql: ${SHOW_SQL:false}
+    open-in-view: false
 
   h2:
     console:
-      enabled: true
+      enabled: ${H2_CONSOLE:false}
       path: /h2-console
 
-
-
-
+app:
+  # Comma-separated list of allowed frontend origins
+  cors-origins: ${APP_CORS_ORIGINS:http://localhost:5173}
+  # Secret key required for admin endpoints. Empty = no protection (local dev only)
+  admin-key: ${ADMIN_KEY:}

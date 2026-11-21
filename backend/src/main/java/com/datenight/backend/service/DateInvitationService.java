@@ -30,6 +30,7 @@ public class DateInvitationService {
                 request.getRestaurantName(),
                 request.getSelectedDate()
         );
+        applyPersonalization(invitation, request);
 
         return dateInvitationRepository.save(invitation);
     }
@@ -63,8 +64,25 @@ public class DateInvitationService {
 
         invitation.setRestaurantName(request.getRestaurantName());
         invitation.setSelectedDate(request.getSelectedDate());
+        applyPersonalization(invitation, request);
 
         return dateInvitationRepository.save(invitation);
+    }
+
+    private void applyPersonalization(DateInvitation invitation,
+                                      CreateInvitationRequest request) {
+        invitation.setGuestName(clean(request.getGuestName(), 50));
+        invitation.setPersonalMessage(clean(request.getPersonalMessage(), 500));
+    }
+
+    private static String clean(String value, int maxLength) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.length() > maxLength
+                ? trimmed.substring(0, maxLength)
+                : trimmed;
     }
 
     // Get an invitation using its public token

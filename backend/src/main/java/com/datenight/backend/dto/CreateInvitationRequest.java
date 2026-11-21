@@ -7,6 +7,8 @@ public class CreateInvitationRequest {
 
     private String restaurantName;
     private LocalDate selectedDate;
+    private String guestName;
+    private String personalMessage;
 
     public CreateInvitationRequest() {
     }
@@ -25,5 +27,21 @@ public class CreateInvitationRequest {
 
     public void setSelectedDate(LocalDate selectedDate) {
         this.selectedDate = selectedDate;
+    }
+
+    public String getGuestName() {
+        return guestName;
+    }
+
+    public void setGuestName(String guestName) {
+        this.guestName = guestName;
+    }
+
+    public String getPersonalMessage() {
+        return personalMessage;
+    }
+
+    public void setPersonalMessage(String personalMessage) {
+        this.personalMessage = personalMessage;
     }
 }
