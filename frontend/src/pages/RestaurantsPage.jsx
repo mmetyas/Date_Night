@@ -104,7 +104,7 @@ function RestaurantsPage() {
         <p className="eyebrow">FIRST, THE WHERE</p>
 
         <h1>
-          Where shall we <em>go?</em>
+          t7by tro7y fen b2a 🥰🥰
         </h1>
 
         <p>
@@ -195,7 +195,7 @@ function RestaurantsPage() {
             type="submit"
             disabled={!selectedRestaurant || !selectedDate || isSaving}
           >
-            {isSaving ? 'Saving your date…' : 'Make it a date ↗'}
+            {isSaving ? 'Saving your date…' : 'Yalla binaa ♥ 😄'}
           </button>
         </div>
 

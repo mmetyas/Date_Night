@@ -187,8 +187,7 @@ function PublicInvitationPage() {
         <section className="state-panel invitation-result">
           {invitation.status === 'ACCEPTED' ? (
             <>
-              <h2>It's a date! ♥</h2>
-
+                 <h2>Yalla bena ya Amooooomiiii ♥ 😄</h2>
               <p>
                 You chose{' '}
                 <strong>{invitation.respondedRestaurant}</strong>.

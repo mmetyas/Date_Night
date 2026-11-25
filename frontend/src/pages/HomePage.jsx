@@ -7,10 +7,10 @@ function HomePage() {
       <section className="hero-section">
         <div className="hero-copy">
           <p className="eyebrow">THE ART OF BEING TOGETHER</p>
-          <h1>Make room for<br /><em>little moments.</em></h1>
+          <h1>Happy Birthday ya Amaooooom ♥ ♥<br /><em>Yalla a5tary makan ^_^</em></h1>
           <p className="hero-description">The best dates don't need a reason. Pick a place, choose a day, and let the rest become a memory worth keeping.</p>
           <div className="hero-actions">
-            <Link to="/restaurants" className="button button-dark">Plan our next date <span>↗</span></Link>
+            <Link to="/restaurants" className="button button-dark">Dosy hena  😄 ♥<span>↗</span></Link>
             <Link to="/invitations" className="text-link">See our plans <span>→</span></Link>
           </div>
           <div className="hero-note"><span className="note-heart">♥</span><span><b>Just the two of us</b><small>One date at a time.</small></span></div>
