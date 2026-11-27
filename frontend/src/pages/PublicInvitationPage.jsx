@@ -177,9 +177,7 @@ function PublicInvitationPage() {
         <h2>{formatInvitationDate(invitation.selectedDate)}</h2>
 
         <p>
-          The original suggestion was{' '}
-          <strong>{invitation.restaurantName}</strong>.
-          But you get to choose the final destination!
+        E5tary nty b2a 3la mzagk 3shan ana msh 3arf bs 7ass EVORA da koayes bayn 😄😄 
         </p>
       </section>
 
@@ -187,7 +185,7 @@ function PublicInvitationPage() {
         <section className="state-panel invitation-result">
           {invitation.status === 'ACCEPTED' ? (
             <>
-                 <h2>Yalla bena ya Amooooomiiii ♥ 😄</h2>
+                 <h2>Yalla bena ya Amooooomiiii 😄 🎂 ❤️</h2>
               <p>
                 You chose{' '}
                 <strong>{invitation.respondedRestaurant}</strong>.
@@ -208,7 +206,7 @@ function PublicInvitationPage() {
             <p className="eyebrow">YOUR CHOICE</p>
 
             <h2>
-              Where should we <em>go?</em>
+          t7by tro7y fen b2a 🥰🥰
             </h2>
 
             <p>Pick your favorite place for our date.</p>
@@ -248,7 +246,7 @@ function PublicInvitationPage() {
                 disabled={!selectedRestaurant || isSubmitting}
                 onClick={() => handleRespond('ACCEPTED')}
               >
-                {isSubmitting ? 'Sending...' : "Yes, it's a date! ♥"}
+                {isSubmitting ? 'Sending...' : "Yalla binaaa 🎂❤️"}
               </button>
 
               <button
